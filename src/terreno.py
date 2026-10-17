@@ -57,4 +57,32 @@ def colocar_zona(
 
     nuevo[f1:f2 + 1, c1:c2 + 1] = nivel
 
+    
+def riesgo(terreno: np.ndarray, pos: Posicion) -> int:
+    """Riesgo de la celda según su nivel de inundación."""
+    if not es_transitable(terreno, pos):
+        raise ValueError(
+            f"La celda {pos} no es transitable y no tiene riesgo definido"
+        )
+
+    return RIESGO_POR_NIVEL[int(terreno[pos])]
+
+
+def costo_paso(
+    terreno: np.ndarray,
+    destino: Posicion,
+    lam: float = 1.0
+) -> float:
+    """Costo de moverse a la celda destino: 1 + lam * riesgo(destino).
+
+    - El 1 representa la distancia (un paso).
+    - lam controla cuánto pesa el riesgo frente a la distancia:
+      lam = 0 solo cuenta pasos; un lam mayor castiga más las zonas inundadas.
+    """
+    if lam < 0:
+        raise ValueError("lam no puede ser negativo")
+
+    return 1.0 + lam * riesgo(terreno, destino)
+
+
     return nuevo
