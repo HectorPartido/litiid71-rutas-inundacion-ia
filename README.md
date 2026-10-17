@@ -11,9 +11,9 @@ Prototipo que simula una zona inundada representada como cuadrícula. Un agente 
 | Integrante | Usuario de GitHub | Rol |
 |---|---|---|
 | Hector Partido Flores | @HectorPartido | Coordinación, integración y documentación |
-| Ismael Alexander Hidalgo Aguilando | @HectorMartinez17 | Modelo del terreno y visualización |
-| Hector Martínez Sánchez | @Thenoob20-0 | Búsqueda no informada (BFS, DFS, UCS) |
-| Gildardo Emmanuel González García | @Ismael-78 | Búsqueda informada (Greedy, A*) y comparación |
+| Ismael Alexander Hidalgo Aguilando | @Ismael-78 | Modelo del terreno y visualización |
+| Hector Martínez Sánchez | @HectorMartinez17 | Búsqueda no informada (BFS, DFS, UCS) |
+| Gildardo Emmanuel González García | @Thenoob20-0 | Búsqueda informada (Greedy, A*) y comparación |
 | Anthony Oziel Ramos López | @ThonyOziel | Validación de rutas y pruebas |
 
 ## Estructura del repositorio
