@@ -99,3 +99,52 @@ def dfs(terreno, inicio: Posicion, refugios: list[Posicion],
     return construir_resultado("DFS", terreno, lam, padres, None, expandidos,
                                generados, frontera_max,
                                (time.perf_counter() - t0) * 1000)
+
+
+
+def ucs(terreno, inicio: Posicion, refugios: list[Posicion],
+        lam: float = 1.0) -> Resultado:
+    """Búsqueda de costo uniforme: encuentra la ruta de MENOR COSTO.
+
+    El costo de cada paso es 1 + lam * riesgo, así que el riesgo
+    sí influye en la decisión.
+    """
+    t0 = time.perf_counter()
+    metas = set(refugios)
+
+    if not es_transitable(terreno, inicio):
+        return construir_resultado("UCS", terreno, lam, {}, None, 0, 0, 0,
+                                   (time.perf_counter() - t0) * 1000)
+
+    contador = 0  # desempate estable cuando dos nodos tienen el mismo costo
+    frontera = [(0.0, contador, inicio)]
+    mejor_costo = {inicio: 0.0}
+    padres = {inicio: None}
+    cerrados = set()
+    generados, expandidos, frontera_max = 1, 0, 1
+
+    while frontera:
+        g, _, actual = heapq.heappop(frontera)
+        if actual in cerrados:
+            continue  # entrada vieja: ya se expandió con un costo menor
+        cerrados.add(actual)
+
+        if actual in metas:
+            return construir_resultado("UCS", terreno, lam, padres, actual,
+                                       expandidos, generados, frontera_max,
+                                       (time.perf_counter() - t0) * 1000)
+
+        expandidos += 1
+        for vecino in vecinos(terreno, actual):
+            nuevo_g = g + costo_paso(terreno, vecino, lam)
+            if vecino not in cerrados and nuevo_g < mejor_costo.get(vecino, float("inf")):
+                mejor_costo[vecino] = nuevo_g
+                padres[vecino] = actual
+                contador += 1
+                heapq.heappush(frontera, (nuevo_g, contador, vecino))
+                generados += 1
+        frontera_max = max(frontera_max, len(frontera))
+
+    return construir_resultado("UCS", terreno, lam, padres, None, expandidos,
+                               generados, frontera_max,
+                               (time.perf_counter() - t0) * 1000)
