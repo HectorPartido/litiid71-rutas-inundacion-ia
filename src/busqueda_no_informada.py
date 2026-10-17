@@ -54,3 +54,48 @@ def bfs(terreno, inicio: Posicion, refugios: list[Posicion],
     return construir_resultado("BFS", terreno, lam, padres, None, expandidos,
                                generados, frontera_max,
                                (time.perf_counter() - t0) * 1000)
+
+                               
+
+def dfs(terreno, inicio: Posicion, refugios: list[Posicion],
+        lam: float = 1.0) -> Resultado:
+    """Búsqueda en profundidad: encuentra UNA ruta, sin garantía de ser buena.
+
+    Sirve como contraste: muestra la diferencia entre encontrar una ruta
+    y encontrar una ruta conveniente.
+    """
+    t0 = time.perf_counter()
+    metas = set(refugios)
+
+    if not es_transitable(terreno, inicio):
+        return construir_resultado("DFS", terreno, lam, {}, None, 0, 0, 0,
+                                   (time.perf_counter() - t0) * 1000)
+
+    pila = [inicio]
+    padres = {inicio: None}
+    visitados = set()
+    generados, expandidos, frontera_max = 1, 0, 1
+
+    while pila:
+        actual = pila.pop()
+        if actual in visitados:
+            continue
+        visitados.add(actual)
+
+        if actual in metas:
+            return construir_resultado("DFS", terreno, lam, padres, actual,
+                                       expandidos, generados, frontera_max,
+                                       (time.perf_counter() - t0) * 1000)
+
+        expandidos += 1
+        # Se apilan al revés para explorar en el orden de MOVIMIENTOS.
+        for vecino in reversed(vecinos(terreno, actual)):
+            if vecino not in visitados:
+                padres[vecino] = actual
+                pila.append(vecino)
+                generados += 1
+        frontera_max = max(frontera_max, len(pila))
+
+    return construir_resultado("DFS", terreno, lam, padres, None, expandidos,
+                               generados, frontera_max,
+                               (time.perf_counter() - t0) * 1000)
