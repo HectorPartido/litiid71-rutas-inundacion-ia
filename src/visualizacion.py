@@ -87,3 +87,26 @@ def leyenda(fig, con_ruta=True):
         elementos.append(Line2D([0], [0], color=COLOR_RUTA, linewidth=2.5, label="Ruta"))
     fig.legend(handles=elementos, loc="outside lower center", ncol=len(elementos),
                frameon=False, fontsize=8)
+
+    
+
+def comparar_rutas(terreno, inicio, refugios, resultados, columnas=3):
+    """Dibuja un panel por algoritmo con su ruta, costo y pasos en el título."""
+    n = len(resultados)
+    filas_fig = (n + columnas - 1) // columnas
+    ancho = terreno.shape[1] * 0.42 * columnas + 1
+    alto = terreno.shape[0] * 0.42 * filas_fig + 1.2
+    fig, ejes = plt.subplots(filas_fig, columnas, figsize=(ancho, alto),
+                             squeeze=False, layout="constrained")
+
+    for ax, r in zip(ejes.flat, resultados):
+        if r.encontrada:
+            titulo = f"{r.algoritmo} · costo {r.costo:g} · {r.pasos} pasos"
+        else:
+            titulo = f"{r.algoritmo} · sin ruta"
+        dibujar_terreno(terreno, inicio, refugios, r.ruta, titulo, ax=ax)
+    for ax in list(ejes.flat)[n:]:
+        ax.axis("off")
+
+    leyenda(fig)
+    return fig
