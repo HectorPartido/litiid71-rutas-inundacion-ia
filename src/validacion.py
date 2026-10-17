@@ -81,3 +81,25 @@ def hay_camino(terreno, inicio: Posicion, refugios: list[Posicion]) -> bool:
                 visitados.add(sig)
                 cola.append(sig)
     return False
+
+
+
+def validar_resultado(terreno, inicio: Posicion, refugios: list[Posicion],
+                      resultado: Resultado, lam: float = 1.0) -> tuple[bool, list[str]]:
+    """Valida un Resultado completo. Devuelve (es_valido, lista_de_errores).
+
+    - Si el algoritmo encontró ruta: revisa estructura y métricas.
+    - Si dijo que no hay ruta: confirma que realmente no existe ninguna.
+    """
+    if not resultado.encontrada:
+        errores = []
+        if resultado.ruta:
+            errores.append("Dice que no encontró ruta, pero devolvió una")
+        if hay_camino(terreno, inicio, refugios):
+            errores.append("Dice que no hay ruta, pero sí existe un camino al refugio")
+        return len(errores) == 0, errores
+
+    errores = revisar_estructura(terreno, inicio, refugios, resultado.ruta)
+    if not errores:
+        errores += revisar_metricas(terreno, resultado, lam)
+    return len(errores) == 0, errores
