@@ -64,3 +64,50 @@ def greedy(terreno, inicio: Posicion, refugios: list[Posicion],
     return construir_resultado("Greedy", terreno, lam, padres, None, expandidos,
                                generados, frontera_max,
                                (time.perf_counter() - t0) * 1000)
+
+
+def a_estrella(terreno, inicio: Posicion, refugios: list[Posicion],
+               lam: float = 1.0) -> Resultado:
+    """A*: ordena la frontera por f = g + h.
+
+    - g: costo real acumulado (incluye el riesgo: 1 + lam * riesgo por paso).
+    - h: heurística Manhattan al refugio más cercano.
+    Encuentra la misma ruta óptima que UCS, normalmente expandiendo menos nodos.
+    """
+    t0 = time.perf_counter()
+    metas = set(refugios)
+    if not es_transitable(terreno, inicio) or not refugios:
+        return construir_resultado("A*", terreno, lam, {}, None, 0, 0, 0,
+                                   (time.perf_counter() - t0) * 1000)
+    contador = 0
+    h0 = heuristica_manhattan(inicio, refugios)
+    # Orden: menor f; en empate, menor h (el más cercano a la meta); luego estable.
+    frontera = [(h0, h0, contador, inicio)]
+    mejor_g = {inicio: 0.0}
+    padres = {inicio: None}
+    cerrados = set()
+    generados, expandidos, frontera_max = 1, 0, 1
+    while frontera:
+        _, _, _, actual = heapq.heappop(frontera)
+        if actual in cerrados:
+            continue  # entrada vieja: ya se expandió con un costo menor
+        cerrados.add(actual)
+        if actual in metas:
+            return construir_resultado("A*", terreno, lam, padres, actual,
+                                       expandidos, generados, frontera_max,
+                                       (time.perf_counter() - t0) * 1000)
+        expandidos += 1
+        g_actual = mejor_g[actual]
+        for vecino in vecinos(terreno, actual):
+            nuevo_g = g_actual + costo_paso(terreno, vecino, lam)
+            if vecino not in cerrados and nuevo_g < mejor_g.get(vecino, float("inf")):
+                mejor_g[vecino] = nuevo_g
+                padres[vecino] = actual
+                h = heuristica_manhattan(vecino, refugios)
+                contador += 1
+                heapq.heappush(frontera, (nuevo_g + h, h, contador, vecino))
+                generados += 1
+        frontera_max = max(frontera_max, len(frontera))
+    return construir_resultado("A*", terreno, lam, padres, None, expandidos,
+                               generados, frontera_max,
+                               (time.perf_counter() - t0) * 1000)
