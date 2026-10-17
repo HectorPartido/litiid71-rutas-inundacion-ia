@@ -40,3 +40,20 @@ def revisar_estructura(terreno, inicio: Posicion, refugios: list[Posicion],
     if len(set(ruta)) != len(ruta):
         errores.append("La ruta pasa más de una vez por la misma celda")
     return errores
+
+
+def revisar_metricas(terreno, resultado: Resultado, lam: float) -> list[str]:
+    """Recalcula pasos, riesgo y costo, y los compara con lo que reportó el algoritmo."""
+    ruta = resultado.ruta
+    pasos = len(ruta) - 1
+    riesgo_total = sum(RIESGO_POR_NIVEL[int(terreno[c])] for c in ruta[1:])
+    costo = pasos + lam * riesgo_total
+
+    errores = []
+    if resultado.pasos != pasos:
+        errores.append(f"Pasos reportados {resultado.pasos}, recalculados {pasos}")
+    if not math.isclose(resultado.riesgo_acumulado, riesgo_total):
+        errores.append(f"Riesgo reportado {resultado.riesgo_acumulado}, recalculado {riesgo_total}")
+    if not math.isclose(resultado.costo, costo):
+        errores.append(f"Costo reportado {resultado.costo}, recalculado {costo}")
+    return errores
