@@ -57,7 +57,9 @@ def colocar_zona(
 
     nuevo[f1:f2 + 1, c1:c2 + 1] = nivel
 
-    
+    return nuevo
+
+
 def riesgo(terreno: np.ndarray, pos: Posicion) -> int:
     """Riesgo de la celda según su nivel de inundación."""
     if not es_transitable(terreno, pos):
@@ -85,4 +87,16 @@ def costo_paso(
     return 1.0 + lam * riesgo(terreno, destino)
 
 
-    return nuevo
+
+def vecinos(terreno: np.ndarray, pos: Posicion) -> list[Posicion]:
+    """Celdas transitables a las que se puede mover desde pos (4 direcciones)."""
+    fila, columna = pos
+    resultado = []
+
+    for df, dc in MOVIMIENTOS:
+        siguiente = (fila + df, columna + dc)
+
+        if es_transitable(terreno, siguiente):
+            resultado.append(siguiente)
+
+    return resultado
