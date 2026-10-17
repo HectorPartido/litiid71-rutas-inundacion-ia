@@ -57,3 +57,27 @@ def revisar_metricas(terreno, resultado: Resultado, lam: float) -> list[str]:
     if not math.isclose(resultado.costo, costo):
         errores.append(f"Costo reportado {resultado.costo}, recalculado {costo}")
     return errores
+
+
+
+def hay_camino(terreno, inicio: Posicion, refugios: list[Posicion]) -> bool:
+    """Exploración independiente: ¿existe algún camino del inicio a un refugio?
+
+    Sirve para confirmar que, cuando un algoritmo dice "sin ruta",
+    realmente no existe ninguna.
+    """
+    if not _dentro(terreno, inicio) or terreno[inicio] == BLOQUEADA:
+        return False
+    metas = set(refugios)
+    visitados = {inicio}
+    cola = deque([inicio])
+    while cola:
+        actual = cola.popleft()
+        if actual in metas:
+            return True
+        for df, dc in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+            sig = (actual[0] + df, actual[1] + dc)
+            if _dentro(terreno, sig) and terreno[sig] != BLOQUEADA and sig not in visitados:
+                visitados.add(sig)
+                cola.append(sig)
+    return False
